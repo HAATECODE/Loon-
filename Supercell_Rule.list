@@ -1,0 +1,74 @@
+# ============================================================
+# Supercell 游戏厂商域名规则（Loon 格式）
+# 生成日期：2026-06-03
+# 数据来源：https://supercell.com/en/our-domains
+# 
+# 包含 Supercell 官方所有域名：
+#   - 核心域名（supercell.com 等）
+#   - 游戏专属域名（部落冲突、皇室战争、荒野乱斗等）
+#   - API / CDN / 账号服务域名
+#   - 已知子域名（通配符覆盖）
+#
+# 使用方式：
+#   方式一（本地规则）：将需要的规则行复制到 [Rule] 区域
+#   方式二（远程订阅）：上传此文件到 GitHub，在 [Remote Rule] 中引用
+#   方式三（直接引用）：复制下方 DOMAIN-SUFFIX 规则到配置文件
+# ============================================================
+
+# === 核心域名 ===
+DOMAIN-SUFFIX,supercell.com
+DOMAIN-SUFFIX,supercellid.com
+DOMAIN-SUFFIX,supercellstore.com
+DOMAIN-SUFFIX,supercellgames.com
+DOMAIN-SUFFIX,supercellcreators.com
+DOMAIN-SUFFIX,gamesfirsthelsinki.com
+
+# === 游戏专属域名 ===
+# 部落冲突（Clash of Clans）
+DOMAIN-SUFFIX,clashofclans.com
+DOMAIN-SUFFIX,clash.com
+
+# 皇室战争（Clash Royale）
+DOMAIN-SUFFIX,clashroyale.com
+
+# 荒野乱斗（Brawl Stars）
+DOMAIN-SUFFIX,brawlstars.com
+
+# 海岛奇兵（Boom Beach）
+DOMAIN-SUFFIX,boombeach.com
+
+# 田园物语（Hay Day）
+DOMAIN-SUFFIX,hayday.com
+DOMAIN-SUFFIX,haydaygame.com
+
+# 部落冲突：迷你（Clash Mini，已停服但仍需覆盖）
+DOMAIN-SUFFIX,clashmini.com
+
+# Squad Busters
+DOMAIN-SUFFIX,squadbusters.com
+
+# mo.co（Supercell 新作）
+DOMAIN-SUFFIX,mo.co
+
+# === API / 服务子域名（已包含在通配符中，单独列出以便审查）===
+# accounts.supercell.com   - 账号服务
+# id.supercell.com         - Supercell ID 登录
+# cdn.id.supercell.com     - ID 服务 CDN
+# support.supercell.com    - 客服支持
+# store.supercell.com      - 商城
+# shop.supercell.com       - 商店
+# cn-mall.supercell.com    - 中国商城
+# cdn.supercell.com        - 全局 CDN
+# creators.supercell.com   - 创作者计划
+# esports.supercell.com    - 电竞赛事
+# make.supercell.com       - 创作工具
+# forum.supercell.com      - 论坛
+# fankit.supercell.com     - 粉丝工具包
+# apollo.supercell.com     - 后端服务
+# pandora.supercell.com    - 后端服务
+# mtp.supercell.com        - MTP 服务
+# helvpn.supercell.com     - 内部 VPN
+# clashevents.supercell.com - 赛事服务
+
+# === 招聘相关 ===
+DOMAIN-SUFFIX,recruitee.com
