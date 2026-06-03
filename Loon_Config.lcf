@@ -1,0 +1,348 @@
+#Loon Best Configuration
+#Date: 2026.05.28
+#Version: 6.0
+#Author: AI Generated (Based on community best practices)
+#Reference: nsloon.app docs, Loon0x00/LoonExampleConfig, luestr/ProxyResource, blackmatrix7/ios_rule_script
+#
+# === 配置说明 ===
+# 本配置融合了社区主流最佳实践，适用于 Loon 最新版（App Store）
+# 特性：
+#   - 国内直连 + 国外代理 智能分流
+#   - 多区域节点自动优选（url-test）+ 手动选择（select）
+#   - 广告拦截（REJECT）
+#   - DNS 加密查询（DoH/DoH3/DoQ）
+#   - MITM 支持（用于脚本解密 HTTPS）
+#   - 社区插件一键增强
+#
+# === 规则优先级说明 ===
+# Loon 规则匹配遵循以下优先级：
+#   1. 域名类规则 > IP 类规则（Loon 引擎内置，不可更改）
+#   2. 来源优先级：本地规则 > 插件规则 > 订阅规则
+#   3. 同类型同来源规则按书写顺序匹配（先写的优先）
+#   4. FINAL 规则兜底
+#
+# === 规则编排原则 ===
+#   ① 广告拦截（REJECT）→ 最先拦截，避免广告请求走代理浪费流量
+#   ② AI / 流媒体 / 社交等特定服务 → 精细分流
+#   ③ 科技公司服务 → Google/Apple/Microsoft 等大范围覆盖
+#   ④ 全球代理兜底 → 剩余未匹配流量走代理
+#   ⑤ 国内 IP 走 GEOIP,CN 直连（本地规则）
+#   ⑥ FINAL → 终极兜底
+#
+# 使用方式：
+#   1. 将 [Remote Proxy] 中的订阅链接替换为你自己的机场订阅
+#   2. 在 Loon 中导入此配置（通过 URL 或本地文件）
+#   3. 开启 MITM：设置 → MITM → 生成证书 → 安装 → 信任
+#   4. 首次使用建议执行"全部更新"以拉取远程规则和插件
+
+# ============================================================
+# [General] 全局设置
+# ============================================================
+[General]
+# --- IP 模式 ---
+ipv6 = false
+ip-mode = v4-only
+ipv6-vif = off
+
+# --- DNS 设置 ---
+dns-server = system,223.5.5.5,119.29.29.29
+doh-server = https://dns.alidns.com/dns-query,https://doh.pub/dns-query
+doh3-server = h3://dns.alidns.com/dns-query
+doq-server = quic://dns.alidns.com:853
+
+# --- SNI 嗅探 ---
+sni-sniffing = true
+
+# --- STUN 禁用（避免 WebRTC 泄露真实 IP）---
+disable-stun = true
+
+# --- DNS 拦截模式 ---
+dns-reject-mode = LoopbackIP
+domain-reject-mode = DNS
+
+# --- UDP 回退行为 ---
+udp-fallback-mode = REJECT
+
+# --- 策略变更时断开连接 ---
+disconnect-on-policy-change = false
+
+# --- WiFi 共享 ---
+allow-wifi-access = false
+wifi-access-http-port = 7222
+wifi-access-socks5-port = 7221
+
+# --- 测速设置 ---
+proxy-test-url = http://www.gstatic.com/generate_204
+internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
+test-timeout = 3
+
+# --- 连续失败切换次数 ---
+switch-node-after-failure-times = 3
+
+# --- 接口模式 ---
+interface-mode = auto
+
+# --- GeoIP 数据源 ---
+geoip-url = https://geodata.kelee.one/Country-Masaiki.mmdb
+ipasn-url = https://geodata.kelee.one/GeoLite2-ASN-P3TERX.mmdb
+
+# --- 跳过代理（局域网/本地地址）---
+skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,e.crashlynatics.com,*.cmpassport.com,*.jegotrip.com.cn,*.icitymobile.mobi,id6.me,*.pingan.com.cn,*.cmbchina.com
+
+# --- 旁路隧道（TUN 旁路）---
+bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32
+
+# ============================================================
+# [Host] DNS 映射（指定域名使用特定 DNS）
+# ============================================================
+[Host]
+*.taobao.com = server:223.5.5.5
+*.tmall.com = server:223.5.5.5
+*.jd.com = server:119.28.28.28
+*.qq.com = server:119.28.28.28
+*.tencent.com = server:119.28.28.28
+*.alicdn.com = server:223.5.5.5
+*.aliyun.com = server:223.5.5.5
+*.weixin.com = server:119.28.28.28
+*.163.com = server:119.29.29.29
+*.126.com = server:119.29.29.29
+*.126.net = server:119.29.29.29
+*.127.net = server:119.29.29.29
+*.netease.com = server:119.29.29.29
+*.mi.com = server:119.29.29.29
+*.xiaomi.com = server:119.29.29.29
+*.bilibili.com = server:119.29.29.29
+*testflight.apple.com = server:8.8.4.4
+mtalk.google.com = 108.177.125.188
+dl.google.com = server:119.29.29.29
+dl.l.google.com = server:119.29.29.29
+
+# ============================================================
+# [Proxy] 本地节点（可选，一般使用订阅即可）
+# ============================================================
+[Proxy]
+# my-ss = Shadowsocks,server.com,443,aes-128-gcm,"password"
+# my-vmess = vmess,server.com,443,aes-128-gcm,"uuid",transport=ws,path=/,host=example.com,over-tls=true,tls-name=example.com
+# my-trojan = trojan,server.com,443,"password",tls-name=example.com
+
+# ============================================================
+# [Remote Proxy] 远程订阅节点
+# ============================================================
+[Remote Proxy]
+Cola = http://120.24.254.184:8086/cc5f-4032-93d1/11a26b9bb24cbe5b80a5ff1a3a809c2d,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
+# ★★★ 请将下方链接替换为你自己的订阅 URL ★★★
+# Sub = https://your-subscription-url-here
+
+# ============================================================
+# [Remote Filter] 订阅节点过滤器
+# ============================================================
+[Remote Filter]
+HK_Filter = NameRegex, FilterKey = "(?i)(港|HK|Hong Kong|HongKong|🇭🇰)"
+TW_Filter = NameRegex, FilterKey = "(?i)(台|TW|Taiwan|🇹🇼)"
+JP_Filter = NameRegex, FilterKey = "(?i)(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵)"
+KR_Filter = NameRegex, FilterKey = "(?i)(KR|Korea|KOR|首尔|韩|韓|🇰🇷)"
+US_Filter = NameRegex, FilterKey = "(?i)(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|西雅图|芝加哥|US|United States|🇺🇸)"
+SG_Filter = NameRegex, FilterKey = "(?i)(新加坡|坡|狮城|SG|Singapore|🇸🇬)"
+EU_Filter = NameRegex, FilterKey = "(?i)(英|UK|GB|伦敦|德|DE|法兰克福|法|FR|巴黎|EU|欧洲|🇬🇧|🇩🇪|🇫🇷)"
+OTHER_Filter = NameRegex, FilterKey = "(?i)(印度|IN|土耳其|TR|巴西|BR|俄罗斯|RU|加拿大|CA|澳洲|AU)"
+
+# ============================================================
+# [Proxy Group] 策略组
+# ============================================================
+[Proxy Group]
+策略选择 = select,全球手动,香港优选,台湾优选,日本优选,韩国优选,美国优选,新加坡优选,欧洲优选,REJECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Urltest.png
+
+全球手动 = select,DIRECT,香港优选,台湾优选,日本优选,韩国优选,美国优选,新加坡优选,欧洲优选,策略选择,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png
+
+香港优选 = url-test,HK_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 100,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png
+台湾优选 = url-test,TW_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 150,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png
+日本优选 = url-test,JP_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 100,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png
+韩国优选 = url-test,KR_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 150,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/KR.png
+美国优选 = url-test,US_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 100,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png
+新加坡优选 = url-test,SG_Filter,url = http://www.gstatic.com/generate_204,interval = 300,tolerance = 150,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png
+欧洲优选 = url-test,EU_Filter,url = http://www.gstatic.com/generate_204,interval = 600,tolerance = 200,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/UK.png
+
+流媒体 = select,策略选择,香港优选,台湾优选,日本优选,韩国优选,美国优选,新加坡优选,DIRECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
+
+Apple = select,DIRECT,策略选择,香港优选,美国优选,日本优选,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Apple.png
+
+Microsoft = select,DIRECT,策略选择,香港优选,日本优选,美国优选,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Microsoft.png
+
+Google = select,策略选择,香港优选,日本优选,美国优选,DIRECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Google.png
+
+GitHub = select,策略选择,香港优选,日本优选,美国优选,DIRECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Static.png
+
+Telegram = select,策略选择,香港优选,新加坡优选,日本优选,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Telegram.png
+
+AI服务 = select,美国优选,日本优选,韩国优选,新加坡优选,策略选择,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Urltest.png
+
+广告拦截 = select,REJECT,DIRECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Adblock.png
+
+漏网之鱼 = select,策略选择,DIRECT,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Final.png
+
+# ============================================================
+# [Rule] 本地规则
+# 优先级：最高（本地规则 > 插件规则 > 订阅规则）
+# 注意：本地规则只在域名类未匹配时才匹配 IP 类规则
+# ============================================================
+[Rule]
+DOMAIN-KEYWORD,apple,DIRECT
+DOMAIN-KEYWORD,gyks.cf,策略选择
+# --- 直连：局域网（IP 类规则，加 no-resolve 避免无效 DNS 查询）---
+IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+
+# --- 直连：国内 DNS（域名类规则，优先级高于 IP 类）---
+DOMAIN,doh.pub,DIRECT
+DOMAIN,dns.alidns.com,DIRECT
+
+# --- 国内 GeoIP 直连（IP 类规则，兜底国内 IP）---
+GEOIP,CN,DIRECT
+
+# --- 兜底规则 ---
+FINAL,漏网之鱼
+
+# ============================================================
+# [Remote Rule] 远程规则集
+# 优先级：最低（订阅规则 < 插件规则 < 本地规则）
+#
+# ★ 编排顺序（重要！）★
+# Loon 中订阅规则之间按书写顺序匹配（域名类优先于 IP 类）
+# 正确顺序：广告拦截 → AI → 流媒体 → 社交 → 科技公司 → 全球代理
+# 
+# 为什么这个顺序：
+#   1. 广告拦截最前：广告域名被 REJECT 后不再浪费代理流量
+#   2. 国内流量由本地规则 GEOIP,CN 直连 + Proxy.list 之外的域名走 FINAL
+# ============================================================
+[Remote Rule]
+https://raw.githubusercontent.com/HAATECODE/Loon-/refs/heads/main/Rule/Supercell_Rule.list?token=GHSAT0AAAAAAD5NLL734WIWVS4TXFCLTRAY2Q7SWHA, policy=DIRECT, tag=SuperCell, enabled=true
+https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple.lsr, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Loon/Advertising/Advertising_Domain.list, policy=广告拦截, tag=Advertising_Domain.list, enabled=true
+
+# === 第一层：广告拦截（REJECT）===
+# 必须放在最前面，确保广告域名第一时间被拦截
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Advertising/Advertising.list, policy=广告拦截, tag=Advertising, enabled=true
+
+# === 第二层：AI 服务（代理）===
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/OpenAI/OpenAI.list, policy=AI服务, tag=OpenAI, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Claude/Claude.list, policy=AI服务, tag=Claude, enabled=true
+
+# === 第三层：流媒体（代理）===
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/YouTube/YouTube.list, policy=流媒体, tag=YouTube, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Netflix/Netflix.list, policy=流媒体, tag=Netflix, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Disney/Disney.list, policy=流媒体, tag=Disney, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Spotify/Spotify.list, policy=流媒体, tag=Spotify, enabled=true
+
+# === 第四层：社交媒体（代理）===
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Telegram/Telegram.list, policy=Telegram, tag=Telegram, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Twitter/Twitter.list, policy=策略选择, tag=Twitter, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Instagram/Instagram.list, policy=策略选择, tag=Instagram, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Facebook/Facebook.list, policy=策略选择, tag=Facebook, enabled=true
+
+# === 第五层：科技公司服务（可选代理/直连）===
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Microsoft/Microsoft.list, policy=Microsoft, tag=Microsoft, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Google/Google.list, policy=Google, tag=Google, enabled=true
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/GitHub/GitHub.list, policy=GitHub, tag=GitHub, enabled=true
+
+# === 第六层：全球代理兜底 ===
+# Proxy.list 包含 6787 条规则，覆盖大部分需要代理的域名
+# 放在最后，确保以上所有特定规则优先匹配
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Proxy/Proxy.list, policy=策略选择, tag=GlobalProxy, enabled=true
+
+# ============================================================
+# [Rewrite] URL 重写
+# 优先级：本地 Rewrite > 插件中的 Rewrite > 远程 Rewrite
+# ============================================================
+[Rewrite]
+^https?:\/\/(www.)?(g|google)\.cn 302 https://www.google.com
+
+# ============================================================
+# [Remote Rewrite] 远程重写规则
+# ============================================================
+[Remote Rewrite]
+
+# ============================================================
+# [Script] 本地脚本
+# ============================================================
+[Script]
+
+# ============================================================
+# [Remote Script] 远程脚本
+# ============================================================
+[Remote Script]
+
+# ============================================================
+# [Plugin] 插件
+#
+# ★ 插件优先级说明 ★
+# 插件中的规则优先级高于订阅规则（Remote Rule），低于本地规则（Rule）
+# 插件规则只能使用三种策略：DIRECT / REJECT类 / PROXY（用户映射）
+#
+# ★ 当前配置策略 ★
+# 方案 A（推荐）：只使用 Remote Rule 的 Advertising.list（纯规则拦截）
+#   - 不需要 MITM，无需证书配置
+#   - 纯 DNS 级别拦截，性能最好
+#   - 已在上方 [Remote Rule] 中启用
+#
+# 方案 B（增强）：同时使用 Advertising.plugin（规则 + Rewrite + Script）
+#   - 需要开启 MITM 并配置证书
+#   - 可以拦截 HTTPS 广告、修改广告响应
+#   - 去广告效果更强但消耗更多资源
+#   - 如果启用方案 B，建议禁用上方的 Advertising.list 避免重复匹配
+#
+# ★ 去广告插件与去广告规则的关系 ★
+# Advertising.plugin 内含 [Rule] + [Rewrite] + [Script] + [MITM]
+# 与 Advertising.list 存在大量规则重叠
+# 插件中的规则优先级 > 订阅规则，所以插件规则先生效
+# 建议二选一，不要同时启用
+# ============================================================
+[Plugin]
+https://kelee.one/Tool/Loon/Lpx/MailMaster_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Taobao_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/PuPuMall_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/PinDuoDuo_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/ValorantBible_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/LOL_Bible_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/FleaMarket_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/WexinMiniPrograms_Remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Weixin_Official_Accounts_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/CoolApk_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/JD_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Script-Hub.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/QQMusic_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/AppleWeatherEnhancer.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/12306_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Bilibili_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=false
+https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Remove_ads_by_keli.lpx, pin=true, enabled=false
+# --- 去广告插件（增强模式，需 MITM）---
+# 如需启用此插件，请先在上方 [Remote Rule] 中禁用 Advertising.list
+# 并在下方 [MITM] 中添加 hostname
+
+# --- 哔哩哔哩增强（需 MITM）---
+# https://raw.githubusercontent.com/zqzess/rule_for_quantumultX/master/Loon/Plugin/bilibili.plugin, policy=DIRECT, tag=BiliBili, enabled=false
+
+# --- YouTube 广告拦截（无需 MITM）---
+# https://raw.githubusercontent.com/zqzess/rule_for_quantumultX/master/Loon/Plugin/YouTubeAd.plugin, policy=REJECT, tag=YouTubeADs, enabled=false
+
+# --- BoxJs（需 MITM）---
+# https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.loon.plugin, policy=✈️ 策略选择, tag=BoxJs, enabled=false
+
+# --- Sub-Store ---
+# https://raw.githubusercontent.com/Peng-YM/Sub-Store/master/config/Loon.plugin, policy=✈️ 策略选择, tag=Sub-Store, enabled=false
+
+# ============================================================
+# [Mitm] MITM 中间人解密配置
+# ============================================================
+[MITM]
+ca-p12 = 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
+ca-passphrase = UX3D819M
+hostname =
+skip-server-cert-verify = false
+# 启用去广告插件后，需将对应域名添加到 hostname
+# ca-p12 = 
+# ca-passphrase = 
