@@ -6,7 +6,6 @@
 #!version = 1.0.0
 
 [Argument]
-selectNode = node, "PROXY", "DIRECT", tag = 部落冲突节点选择, desc = 请选择部落冲突使用的代理节点或策略组（推荐选择支持 UDP 转发的低延迟节点）
 enableCheck = switch, true, tag = 启用定时诊断, desc = 是否在后台定期测试部落冲突游戏服务器延迟
 
 [General]
@@ -22,23 +21,23 @@ game.clashofclans.com = server:8.8.8.8
 
 [Rule]
 # === 核心游戏通信（优先UDP与低延迟代理）===
-DOMAIN-SUFFIX, clashofclans.com, {selectNode}
-DOMAIN-SUFFIX, clash.com, {selectNode}
+DOMAIN-SUFFIX, clashofclans.com, PROXY
+DOMAIN-SUFFIX, clash.com, PROXY
 
 # === Supercell 基础服务与账号认证 ===
-DOMAIN-SUFFIX, supercell.com, {selectNode}
-DOMAIN-SUFFIX, supercellid.com, {selectNode}
-DOMAIN-SUFFIX, supercellstore.com, {selectNode}
-DOMAIN-SUFFIX, supercellgames.com, {selectNode}
+DOMAIN-SUFFIX, supercell.com, PROXY
+DOMAIN-SUFFIX, supercellid.com, PROXY
+DOMAIN-SUFFIX, supercellstore.com, PROXY
+DOMAIN-SUFFIX, supercellgames.com, PROXY
 
 # === 静态资源与 CDN 加速 ===
-DOMAIN, cdn.supercell.com, {selectNode}
-DOMAIN, cdn.id.supercell.com, {selectNode}
+DOMAIN, cdn.supercell.com, PROXY
+DOMAIN, cdn.id.supercell.com, PROXY
 
 # === 登录与 API 独立匹配 ===
-DOMAIN, id.supercell.com, {selectNode}
-DOMAIN, accounts.supercell.com, {selectNode}
-DOMAIN, game.clashofclans.com, {selectNode}
+DOMAIN, id.supercell.com, PROXY
+DOMAIN, accounts.supercell.com, PROXY
+DOMAIN, game.clashofclans.com, PROXY
 
 [Script]
 # 网络连通性与延迟定时诊断脚本（定时检查或手动点击）
