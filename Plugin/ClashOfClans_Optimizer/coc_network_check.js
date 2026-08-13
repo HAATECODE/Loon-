@@ -10,7 +10,8 @@ const $ = new Env("部落冲突网络检测");
     const startTime = Date.now();
     const testTargets = [
         { name: "Supercell ID 认证服务", url: "https://id.supercell.com" },
-        { name: "部落冲突游戏 API", url: "https://game.clashofclans.com" },
+        { name: "部落冲突开发者服务", url: "https://developer.clashofclans.com" },
+        { name: "部落冲突游戏资源服务", url: "https://game-assets.clashofclans.com" },
         { name: "Supercell 官方 CDN", url: "https://cdn.supercell.com" }
     ];
 
