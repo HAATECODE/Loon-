@@ -1,6 +1,6 @@
 #!name = 部落冲突国际服网络优化插件
 #!desc = 专为 Clash of Clans 国际服打造的极速网络优化插件。包含 DNS 优选、低延迟 UDP 节点分流、Supercell ID 防风控锁定以及连通性诊断脚本。
-#!icon = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clash_of_Clans.png
+#!icon = https://store.supercell.com/public/app-icon-clashofclans-LR5OPSRT.png
 #!author = LoonOptimizer
 #!homepage = https://supercell.com/en/our-domains
 #!version = 1.0.0
