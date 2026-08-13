@@ -1,0 +1,46 @@
+#!name = 部落冲突国际服网络优化插件
+#!desc = 专为 Clash of Clans 国际服打造的极速网络优化插件。包含 DNS 优选、低延迟 UDP 节点分流、Supercell ID 防风控锁定以及连通性诊断脚本。
+#!icon = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clash_of_Clans.png
+#!author = LoonOptimizer
+#!homepage = https://supercell.com/en/our-domains
+#!version = 1.0.0
+
+[Argument]
+selectNode = select, "香港极速节点", "台湾专线", "日本低延迟", "新加坡节点", "自动优选低延迟", input, tag = 部落冲突节点选择, desc = 请选择部落冲突游戏加速节点
+enableCheck = switch, true, tag = 启用定时诊断, desc = 是否在后台定期测试部落冲突游戏服务器延迟
+
+[General]
+# 针对 Supercell 域名禁用 IPv6，防止由于 IPv6 回落造成的游戏加载卡 81% 或卡屏
+ipv6 = false
+
+[Host]
+# 指定 Supercell 账号及核心 API 使用 Cloudflare / Google 加密 DNS 快速解析
+*.supercell.com = server:1.1.1.1
+*.clashofclans.com = server:8.8.8.8
+id.supercell.com = server:1.1.1.1
+game.clashofclans.com = server:8.8.8.8
+
+[Rule]
+# === 核心游戏通信（优先UDP与低延迟代理）===
+DOMAIN-SUFFIX, clashofclans.com, {selectNode}
+DOMAIN-SUFFIX, clash.com, {selectNode}
+
+# === Supercell 基础服务与账号认证 ===
+DOMAIN-SUFFIX, supercell.com, {selectNode}
+DOMAIN-SUFFIX, supercellid.com, {selectNode}
+DOMAIN-SUFFIX, supercellstore.com, {selectNode}
+DOMAIN-SUFFIX, supercellgames.com, {selectNode}
+
+# === 静态资源与 CDN 加速 ===
+DOMAIN, cdn.supercell.com, {selectNode}
+DOMAIN, cdn.id.supercell.com, {selectNode}
+
+# === 登录与 API 独立匹配 ===
+DOMAIN, id.supercell.com, {selectNode}
+DOMAIN, accounts.supercell.com, {selectNode}
+DOMAIN, game.clashofclans.com, {selectNode}
+
+[Script]
+# 网络连通性与延迟定时诊断脚本（定时检查或手动点击）
+cron "0 8 * * *" script-path = https://raw.githubusercontent.com/your-repo/coc_network_check.js, tag = 部落冲突网络状态诊断, enable = {enableCheck}
+http-request ^https:\/\/id\.supercell\.com\/ script-path = coc_network_check.js, requires-body = false, tag = 打开游戏前诊断
