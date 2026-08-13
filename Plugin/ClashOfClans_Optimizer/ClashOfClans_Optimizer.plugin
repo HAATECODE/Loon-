@@ -6,7 +6,7 @@
 #!version = 1.0.0
 
 [Argument]
-selectNode = select, "香港极速节点", "台湾专线", "日本低延迟", "新加坡节点", "自动优选低延迟", input, tag = 部落冲突节点选择, desc = 请选择部落冲突游戏加速节点
+selectNode = node, "PROXY", "DIRECT", tag = 部落冲突节点选择, desc = 请选择部落冲突使用的代理节点或策略组（推荐选择支持 UDP 转发的低延迟节点）
 enableCheck = switch, true, tag = 启用定时诊断, desc = 是否在后台定期测试部落冲突游戏服务器延迟
 
 [General]
