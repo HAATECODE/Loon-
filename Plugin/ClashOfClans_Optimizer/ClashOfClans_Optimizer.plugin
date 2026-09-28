@@ -1,43 +1,45 @@
-﻿#!name = 部落冲突国际服网络优化（开游戏优选）
-#!desc = Supercell 分流 + 禁用 IPv6。PROXY 绑定 select 策略组时，开游戏前在组内测速并锁定节点；会话活跃期内不再切换，降低游戏中掉线风险。
+#!name = 部落冲突国际服网络优化插件
+#!desc = 专为 Clash of Clans 国际服打造的极速网络优化插件。包含 DNS 优选、低延迟 UDP 节点分流、Supercell ID 防风控锁定以及连通性诊断脚本。
 #!icon = https://store.supercell.com/public/app-icon-clashofclans-LR5OPSRT.png
-#!author = LoonOptimizer / 本地增强
+#!author = LoonOptimizer
 #!homepage = https://supercell.com/en/our-domains
-#!version = 1.1.0
-#!loon_version = 3.2.1(733)
+#!version = 1.0.0
 
 [Argument]
-enableLatencyPick = switch, true, tag = 开游戏前组内优选, desc = 访问 Supercell 域名时测速并切换 select 组内节点（同一会话内仅首次）
-cocPolicyGroup = input, "CoC专用", tag = 测速策略组名称, desc = 须与主配置 [Plugin] 中 policy= 一致，且该组类型为 select、子项为节点
-idleMinutes = input, "45", tag = 会话静默(分钟), desc = 超过该时间无匹配请求后，下次开游戏才重新测速；游戏中持续有流量则不会切换
-testUrl = input, "https://id.supercell.com", tag = 测速 URL, desc = 建议与认证域名一致
-perNodeTimeout = input, "4000", tag = 单节点超时(ms), desc = 节点较多时可适当减小并增大脚本 timeout
-notifyOnPick = switch, true, tag = 切换时通知, desc = 仅在选中节点变化时推送通知
-enableCheck = switch, false, tag = 启用定时诊断, desc = 仅通知不测速不切节点（原诊断脚本）
+enableCheck = switch, true, tag = 启用定时诊断, desc = 是否在后台定期测试部落冲突游戏服务器延迟
 
 [General]
+# 针对 Supercell 域名禁用 IPv6，防止由于 IPv6 回落造成的游戏加载卡 81% 或卡屏
 ipv6 = false
 
 [Host]
+# 指定 Supercell 账号及核心 API 使用 Cloudflare / Google 加密 DNS 快速解析
 *.supercell.com = server:1.1.1.1
 *.clashofclans.com = server:8.8.8.8
 id.supercell.com = server:1.1.1.1
 game.clashofclans.com = server:8.8.8.8
 
 [Rule]
+# === 核心游戏通信（优先UDP与低延迟代理）===
 DOMAIN-SUFFIX, clashofclans.com, PROXY
 DOMAIN-SUFFIX, clash.com, PROXY
+
+# === Supercell 基础服务与账号认证 ===
 DOMAIN-SUFFIX, supercell.com, PROXY
 DOMAIN-SUFFIX, supercellid.com, PROXY
 DOMAIN-SUFFIX, supercellstore.com, PROXY
 DOMAIN-SUFFIX, supercellgames.com, PROXY
+
+# === 静态资源与 CDN 加速 ===
 DOMAIN, cdn.supercell.com, PROXY
 DOMAIN, cdn.id.supercell.com, PROXY
+
+# === 登录与 API 独立匹配 ===
 DOMAIN, id.supercell.com, PROXY
 DOMAIN, accounts.supercell.com, PROXY
 DOMAIN, game.clashofclans.com, PROXY
 
 [Script]
-http-request ^https:\/\/id\.supercell\.com\/ script-path = coc_latency_pick.js, requires-body = false, timeout = 120, tag = 开游戏前锁定最优节点, enable = {enableLatencyPick}, argument = [{cocPolicyGroup},{idleMinutes},{testUrl},{perNodeTimeout},{enableLatencyPick},{notifyOnPick}]
-http-request ^https:\/\/(game|game-assets)\.clashofclans\.com\/ script-path = coc_latency_pick.js, requires-body = false, timeout = 120, tag = 游戏资源域会话续期, enable = {enableLatencyPick}, argument = [{cocPolicyGroup},{idleMinutes},{testUrl},{perNodeTimeout},{enableLatencyPick},{notifyOnPick}]
+# 网络连通性与延迟定时诊断脚本（定时检查或手动点击）
 cron "0 8 * * *" script-path = coc_network_check.js, tag = 部落冲突网络状态诊断, enable = {enableCheck}
+http-request ^https:\/\/id\.supercell\.com\/ script-path = coc_network_check.js, requires-body = false, tag = 打开游戏前诊断
